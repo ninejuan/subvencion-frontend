@@ -7,6 +7,7 @@ import VocaDisableIcon from "../assets/icons/menu/voca_disable.svg";
 import MoreEnableIcon from "../assets/icons/menu/more_enable.svg";
 import MoreDisableIcon from "../assets/icons/menu/more_disable.svg";
 import Header from "../components/common/Header";
+import Button from "../components/common/Button";
 
 const MenuLayoutContainer = styled.div`
   width: 100%;
@@ -15,7 +16,7 @@ const MenuLayoutContainer = styled.div`
 
 const Footer = styled.div`
   width: 100%;
-  height: 61px;
+  height: 81px;
   position: sticky;
   top: 100px;
   bottom: -1px;
@@ -24,7 +25,7 @@ const Footer = styled.div`
   border-top: 1px solid #ededed;
 
   display: flex;
-  background-color: #fff;
+  background-color: #f2f4f6;
 `;
 
 const FooterItem = styled.div`
@@ -34,15 +35,10 @@ const FooterItem = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  cursor: pointer;
-`;
-
-const FooterItemImg = styled.img`
-  margin: 0 auto;
 `;
 
 const FooterItemText = styled.div`
-  font-size: 12px;
+  font-size: 15px;
   font-style: normal;
   line-height: normal;
   letter-spacing: -0.12px;
@@ -54,62 +50,23 @@ const FooterItemText = styled.div`
 function MenuLayout() {
   const navigate = useNavigate();
 
-  const { pathname } = useLocation();
-
-  const disableStyle = css`
-    color: #cfcece;
-  `;
-
-  const enableStyle = css`
-    color: #1e1e1e;
-  `;
-
   return (
     <MenuLayoutContainer>
-      <Header>오늘의 단어</Header>
+      <Header></Header>
       <Outlet></Outlet>
       <Footer>
-        <FooterItem
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <FooterItemImg
-            src={pathname === "/" ? TodayWordEnableIcon : TodayWordDisableIcon}
-          ></FooterItemImg>
-          <FooterItemText
-            $customStyle={pathname === "/" ? enableStyle : disableStyle}
-          >
-            오늘의 단어
+        <FooterItem>
+          <FooterItemText>
+            Copyright 2024 Juan Lee, All rights reserved.
           </FooterItemText>
-        </FooterItem>
-        <FooterItem
-          onClick={() => {
-            navigate("/voca");
-          }}
-        >
-          <FooterItemImg
-            src={pathname === "/voca" ? VocaEnableIcon : VocaDisableIcon}
-          ></FooterItemImg>
-          <FooterItemText
-            $customStyle={pathname === "/voca" ? enableStyle : disableStyle}
+          <Button
+            type="text"
+            onClick={() => {
+              navigate("https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin");
+            }}
           >
-            단어장
-          </FooterItemText>
-        </FooterItem>
-        <FooterItem
-          onClick={() => {
-            navigate("/more");
-          }}
-        >
-          <FooterItemImg
-            src={pathname === "/more" ? MoreEnableIcon : MoreDisableIcon}
-          ></FooterItemImg>
-          <FooterItemText
-            $customStyle={pathname === "/more" ? enableStyle : disableStyle}
-          >
-            더보기
-          </FooterItemText>
+            보조금24 바로가기
+          </Button>
         </FooterItem>
       </Footer>
     </MenuLayoutContainer>

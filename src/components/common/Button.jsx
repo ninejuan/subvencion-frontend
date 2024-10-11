@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 const ButtonContainer = styled.div`
-  width: 30%;
+  width: 25%;
   height: 50px;
   border-radius: 8px;
 
