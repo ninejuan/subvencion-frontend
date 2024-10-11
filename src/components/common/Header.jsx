@@ -6,7 +6,6 @@ const HeaderContainer = styled.div`
   padding: 20px;
   background-color: #f2f4f6;
   color: #0e0e0e;
-  border: 2px solid #00ff00;
   font-size: 22px;
   font-style: normal;
   font-weight: 700;
@@ -47,7 +46,7 @@ function Header({ isLoggedIn = false }) {
           >
             검색
           </Button>
-          {isLoggedIn ? (
+          {!isLoggedIn ? (
             <Button
               onClick={() => {
                 navigate("/mypage");

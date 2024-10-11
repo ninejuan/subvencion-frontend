@@ -11,6 +11,9 @@ const ButtonContainer = styled.div`
   ${(props) => props.$customStyle}
   ${(props) => props.$buttonStyle}
   cursor: pointer;
+  @media (max-width: 767px) {
+    width: 20vw;
+  }
 `;
 
 const ButtonText = styled.div`
@@ -20,6 +23,9 @@ const ButtonText = styled.div`
   line-height: normal;
 
   margin-bottom: 2px;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
 `;
 
 const getButtonStyle = (type) => {
@@ -32,6 +38,9 @@ const getButtonStyle = (type) => {
     return css`
       background-color: transparent;
       color: #4e5968;
+      @media (max-width: 767px) {
+        visibility: hidden;
+      }
     `;
   }
 };
