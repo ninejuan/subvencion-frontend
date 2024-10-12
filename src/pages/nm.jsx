@@ -1,21 +1,11 @@
 import SubsidyBox from "../components/subsidy/SubsidyBox";
 import styled from "styled-components";
 
-// 스타일 정의
 const MainContainer = styled.div`
-  display: flex;
+  max-width: 100%;
+  margin: 0 auto;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  margin: 0 auto;
-`;
-
-const BoxContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* 가로 중앙 정렬 */
-  align-items: center; /* 세로 중앙 정렬 */
-  gap: 20px; /* 박스들 간의 간격 */
 `;
 
 function Main() {
@@ -38,21 +28,16 @@ function Main() {
     },
     // 추가 데이터...
   ];
-
   return (
-    <MainContainer>
-      <BoxContainer>
-        {welfareData.map((welfare, index) => (
-          <SubsidyBox key={index} {...welfare} />
-        ))}
-        {welfareData.map((welfare, index) => (
-          <SubsidyBox key={index} {...welfare} />
-        ))}
-        {welfareData.map((welfare, index) => (
-          <SubsidyBox key={index} {...welfare} />
-        ))}
-      </BoxContainer>
-    </MainContainer>
+    <>
+      <MainContainer>
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          {welfareData.map((welfare, index) => (
+            <SubsidyBox key={index} {...welfare} />
+          ))}
+        </div>
+      </MainContainer>
+    </>
   );
 }
 
