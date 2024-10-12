@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+import Logo from "../../assets/logo/1024Logo.svg";
 
 const HeaderContainer = styled.div`
   padding: 20px;
@@ -20,52 +21,81 @@ const HeaderItem = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* flex-direction: column; */
   cursor: pointer;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+`;
+
+const HeaderItemImg = styled.img`
+  width: 70px;
+  height: 70px;
+  margin: 0;
+  @media (max-width: 767px) {
+    width: 50px;
+    height: 50px;
+  }
+`;
+
+const MobileOnlyItem = styled.div`
+  display: none;
+  @media (max-width: 767px) {
+    display: none;
+    flex: 1;
+  }
+`;
+
+const MobileOnlyButton = styled(Button)`
+  display: inline-block;
+  @media (max-width: 767px) {
+    display: none;
+  }
 `;
 
 function Header({ isLoggedIn = false }) {
   const navigate = useNavigate();
+
   return (
-    <>
-      <HeaderContainer>
-        <HeaderItem
+    <HeaderContainer>
+      <HeaderItem
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        <HeaderItemImg src={Logo} />
+        서벤시온
+      </HeaderItem>
+
+      <MobileOnlyItem />
+
+      <HeaderItem>
+        <MobileOnlyButton
+          type="text"
           onClick={() => {
             navigate("/");
           }}
         >
-          서벤시온
-        </HeaderItem>
-        <HeaderItem></HeaderItem>
-        <HeaderItem>
+          검색
+        </MobileOnlyButton>
+        {!isLoggedIn ? (
           <Button
-            type="text"
             onClick={() => {
-              navigate("/");
+              navigate("/mypage");
             }}
           >
-            검색
+            마이페이지
           </Button>
-          {!isLoggedIn ? (
-            <Button
-              onClick={() => {
-                navigate("/mypage");
-              }}
-            >
-              마이페이지
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                navigate("/signin");
-              }}
-            >
-              로그인
-            </Button>
-          )}
-        </HeaderItem>
-      </HeaderContainer>
-    </>
+        ) : (
+          <Button
+            onClick={() => {
+              navigate("/signin");
+            }}
+          >
+            로그인
+          </Button>
+        )}
+      </HeaderItem>
+    </HeaderContainer>
   );
 }
 

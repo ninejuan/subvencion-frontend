@@ -12,7 +12,7 @@ const ButtonContainer = styled.div`
   ${(props) => props.$buttonStyle}
   cursor: pointer;
   @media (max-width: 767px) {
-    width: 20vw;
+    width: 55%;
   }
 `;
 
@@ -24,7 +24,7 @@ const ButtonText = styled.div`
 
   margin-bottom: 2px;
   @media (max-width: 767px) {
-    font-size: 16px;
+    font-size: 15px;
   }
 `;
 
