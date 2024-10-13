@@ -1,63 +1,85 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-// 스타일 정의
 const Card = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: ${({ eligible }) => (eligible ? "#e0f7e0" : "#f9f9f9")};
-  margin: 16px;
-  height: 270px;
-  width: 400px;
-  border-color: ${({ eligible }) => (eligible ? "green" : "#ccc")};
+  border-radius: 12px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  height: 230px;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const Badge = styled.div`
-  background-color: green;
+  background-color: #22c55e;
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: bold;
 `;
 
 const Title = styled.h3`
   font-size: 18px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #333;
 `;
 
 const Text = styled.p`
   margin: 4px 0;
+  font-size: 14px;
+  color: #666;
 `;
 
-// SubsidyBox 컴포넌트 정의
-const SubsidyBox = ({
+function SubsidyBox({
   title,
   institution,
   target,
   method,
   deadline,
+  serviceId,
   eligible,
-}) => {
+}) {
+  const navigate = useNavigate();
+
   return (
-    <Card eligible={eligible}>
+    <Card
+      onClick={() => {
+        navigate(`/detail/${serviceId}`);
+      }}
+    >
       {eligible && <Badge>이 혜택을 받을 수 있어요!</Badge>}
       <Title>{title}</Title>
-      <Text>
-        <strong>제공 기관:</strong> {institution}
-      </Text>
-      <Text>
-        <strong>지원 대상:</strong> {target}
-      </Text>
-      <Text>
-        <strong>신청 방법:</strong> {method}
-      </Text>
-      <Text>
-        <strong>신청 기한:</strong> {deadline}
-      </Text>
+      <div>
+        <Text>
+          <strong>제공 기관:</strong> {institution}
+        </Text>
+        <Text>
+          <strong>지원 대상:</strong> {target}
+        </Text>
+        <Text>
+          <strong>신청 방법:</strong> {method}
+        </Text>
+        <Text>
+          <strong>신청 기한:</strong> {deadline}
+        </Text>
+      </div>
     </Card>
   );
-};
+}
 
 export default SubsidyBox;
