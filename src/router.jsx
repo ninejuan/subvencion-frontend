@@ -22,7 +22,7 @@ const router = createBrowserRouter([
             element: <Main />,
           },
           {
-            path: "search/",
+            path: "search/:content",
             element: <Search />,
           },
           {
