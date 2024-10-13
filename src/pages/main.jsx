@@ -1,6 +1,6 @@
 import React from "react";
 import SubsidyBox from "../components/subsidy/SubsidyBox";
-// import SearchComponent from "../components/SearchComponent";
+import SearchInput from "../components/common/SearchInput";
 import styled from "styled-components";
 
 const MainContainer = styled.div`
@@ -69,7 +69,7 @@ function Main() {
   return (
     <MainContainer>
       <Title>서비스 검색하기</Title>
-      {/* <SearchComponent /> */}
+      <SearchInput />
       <BoxContainer>
         {extendedWelfareData.map((welfare, index) => (
           <SubsidyBox key={index} {...welfare} />
