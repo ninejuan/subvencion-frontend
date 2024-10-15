@@ -2,12 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+// 카드 컴포넌트 스타일링
 const Card = styled.div`
   border-radius: 12px;
   padding: 20px;
   background-color: white;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-  height: 230px;
+  height: 250px;
   width: 100%;
   cursor: pointer;
   display: flex;
@@ -21,6 +22,7 @@ const Card = styled.div`
   }
 `;
 
+// 혜택 배지 스타일링
 const Badge = styled.div`
   background-color: #22c55e;
   color: white;
@@ -30,15 +32,19 @@ const Badge = styled.div`
   margin-bottom: 12px;
   font-size: 12px;
   font-weight: bold;
+  width: 45%;
+  text-align: center;
 `;
 
-const Title = styled.h3`
+// 카드 제목 스타일링
+const CardTitle = styled.h3`
   font-size: 18px;
   margin-bottom: 12px;
   font-weight: bold;
   color: #333;
 `;
 
+// 카드 텍스트 스타일링
 const Text = styled.p`
   margin: 4px 0;
   font-size: 14px;
@@ -57,13 +63,9 @@ function SubsidyBox({
   const navigate = useNavigate();
 
   return (
-    <Card
-      onClick={() => {
-        navigate(`/detail/${serviceId}`);
-      }}
-    >
+    <Card onClick={() => navigate(`/detail/${serviceId}`)}>
       {eligible && <Badge>이 혜택을 받을 수 있어요!</Badge>}
-      <Title>{title}</Title>
+      <CardTitle>{title}</CardTitle>
       <div>
         <Text>
           <strong>제공 기관:</strong> {institution}

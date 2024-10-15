@@ -15,7 +15,7 @@ const SearchInputBox = styled.input`
   padding: 12px 20px;
   font-size: 16px;
   border: none;
-  border-radius: 25px;
+  border-radius: 20px;
   background-color: #ffe1e1;
   color: #333;
   outline: none;
@@ -40,17 +40,26 @@ const SearchButton = styled.button`
   cursor: pointer;
 `;
 
-function SearchInput() {
+function SearchInput({ onSearch }) {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
+      onSearch(searchTerm.trim());
       navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value.trim() === "") {
+      onSearch(""); // 검색어가 비어있을 때 초기 상태로 복원
+    }
+  };
+
+  const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
@@ -63,8 +72,8 @@ function SearchInput() {
           type="text"
           placeholder="검색어를 입력해주세요"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
         />
         <SearchButton onClick={handleSearch}>
           <svg

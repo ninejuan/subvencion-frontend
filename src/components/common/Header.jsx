@@ -77,7 +77,7 @@ function Header({ isLoggedIn = false }) {
         >
           검색
         </MobileOnlyButton>
-        {!isLoggedIn ? (
+        {isLoggedIn ? (
           <Button
             onClick={() => {
               navigate("/mypage");
