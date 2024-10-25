@@ -42,6 +42,10 @@ const router = createBrowserRouter([
     ],
     errorElement: <C404 />,
   },
+  {
+    path: "/main",
+    element: <Main />,
+  },
 ]);
 
 export default router;

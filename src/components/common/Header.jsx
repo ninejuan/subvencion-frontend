@@ -2,10 +2,12 @@ import styled from "styled-components";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo/1024Logo.svg";
+import Cookies from "js-cookie";
 
 const HeaderContainer = styled.div`
   padding: 20px;
-  background-color: #f2f4f6;
+  background-color: #fff;
+  border-bottom: 1px solid #ededed;
   color: #0e0e0e;
   font-size: 22px;
   font-style: normal;
@@ -52,9 +54,10 @@ const MobileOnlyButton = styled(Button)`
   }
 `;
 
-function Header({ isLoggedIn = false }) {
+function Header() {
   const navigate = useNavigate();
-
+  const token = Cookies.get("accessToken");
+  let isLoggedIn = token ? true : false;
   return (
     <HeaderContainer>
       <HeaderItem

@@ -10,13 +10,16 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     display: block;
+    /* width: 100%; */
   }
 `;
 
 const AppContainer = styled.div`
   max-width: 100vw;
+  width: 100%;
   /* height: 100%; */
   margin: 0 auto;
+  overflow-x: hidden !important;
 `;
 
 function App() {

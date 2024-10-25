@@ -1,31 +1,25 @@
 import styled, { css } from "styled-components";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import TodayWordEnableIcon from "../assets/icons/menu/today_word_enable.svg";
-import TodayWordDisableIcon from "../assets/icons/menu/today_word_disable.svg";
-import VocaEnableIcon from "../assets/icons/menu/voca_enable.svg";
-import VocaDisableIcon from "../assets/icons/menu/voca_disable.svg";
-import MoreEnableIcon from "../assets/icons/menu/more_enable.svg";
-import MoreDisableIcon from "../assets/icons/menu/more_disable.svg";
 import Header from "../components/common/Header";
 import Button from "../components/common/Button";
 
 const MenuLayoutContainer = styled.div`
   width: 100%;
   height: 100%;
+  overflow-x: hidden; // 가로 스크롤 방지
 `;
 
 const Footer = styled.div`
   width: 100%;
   height: 81px;
-  position: sticky;
-  top: 100px;
-  bottom: -1px;
-  left: 0px;
-
   border-top: 1px solid #ededed;
-
   display: flex;
-  background-color: #f2f4f6;
+  background-color: #fff;
+  padding: 0 20px; // 모바일에서 좌우 여백
+
+  @media (max-width: 767px) {
+    padding: 0 10px;
+  }
 `;
 
 const FooterItem = styled.div`

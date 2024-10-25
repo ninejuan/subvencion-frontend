@@ -8,7 +8,7 @@ const Card = styled.div`
   padding: 20px;
   background-color: white;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-  height: 250px;
+  height: 255px;
   width: 100%;
   cursor: pointer;
   display: flex;
@@ -24,12 +24,12 @@ const Card = styled.div`
 
 // 혜택 배지 스타일링
 const Badge = styled.div`
-  background-color: #22c55e;
+  background-color: #ffa0a0;
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 4px;
+  border-radius:4px;
   display: inline-block;
-  margin-bottom: 12px;
+  margin-bottom: 0px;
   font-size: 12px;
   font-weight: bold;
   width: 45%;
@@ -39,7 +39,8 @@ const Badge = styled.div`
 // 카드 제목 스타일링
 const CardTitle = styled.h3`
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-top: 5px;
+  margin-bottom: 7px;
   font-weight: bold;
   color: #333;
 `;
@@ -51,6 +52,10 @@ const Text = styled.p`
   color: #666;
 `;
 
+function truncateText(text, maxLength) {
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+}
+
 function SubsidyBox({
   title,
   institution,
@@ -60,6 +65,7 @@ function SubsidyBox({
   serviceId,
   eligible,
 }) {
+  const maxLength = 50;
   const navigate = useNavigate();
 
   return (
@@ -68,16 +74,16 @@ function SubsidyBox({
       <CardTitle>{title}</CardTitle>
       <div>
         <Text>
-          <strong>제공 기관:</strong> {institution}
+          <strong>제공 기관:</strong> {truncateText(institution, maxLength)}
         </Text>
         <Text>
-          <strong>지원 대상:</strong> {target}
+          <strong>지원 대상:</strong> {truncateText(target, maxLength)}
         </Text>
         <Text>
-          <strong>신청 방법:</strong> {method}
+          <strong>신청 방법:</strong> {truncateText(method, maxLength)}
         </Text>
         <Text>
-          <strong>신청 기한:</strong> {deadline}
+          <strong>신청 기한:</strong> {truncateText(deadline, maxLength)}
         </Text>
       </div>
     </Card>
