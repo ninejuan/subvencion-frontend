@@ -1,5 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import Cookies from "js-cookie";
+import axios from "axios";
+import {
+  Form,
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 const PageContainer = styled.div`
   max-width: 800px;
@@ -10,7 +19,7 @@ const PageContainer = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 `;
 
 const AvailableTag = styled.div`
@@ -65,6 +74,7 @@ const ApplyButton = styled.button`
   font-size: 16px;
   display: block;
   margin: 0 auto;
+  width: 100%;
 `;
 
 const RequiredDocuments = styled.ul`
@@ -75,77 +85,206 @@ const SupportDetails = styled.div`
   margin-top: 20px;
 `;
 
-const SubsidyDetail = () => {
+const CAN = styled.div`
+  margin-top: 20px;
+`;
+
+function SubsidyDetail() {
+  const navigate = useNavigate();
+
+  const [subsidyId, setSubsidyId] = useState();
+  const [detailedSubsidy, setDetailedSubsidy] = useState({});
+  const [isEligible, setIsEligible] = useState(false);
+  const [error, setError] = useState(null);
+
+  const params = useParams();
+
+  const createAxiosInstance = () => {
+    const token = Cookies.get("accessToken");
+    return token
+      ? axios.create({
+          baseURL: "https://api.juany.kr",
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      : axios.create({ baseURL: "https://api.juany.kr" });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!params.id) {
+        window.location.href = "/404";
+        return;
+      }
+
+      setSubsidyId(params.id);
+
+      try {
+        const axiosInstance = createAxiosInstance();
+        const response = await axiosInstance.get(
+          `/api/subsidies/detail/${params.id}`
+        );
+
+        if (response.data) {
+          setDetailedSubsidy({
+            ...response.data._doc,
+            // ["isEligible"]: response.data.isEligible,
+          });
+          setIsEligible(response.data.isEligible);
+        } else {
+          throw new Error("Data not found");
+        }
+      } catch (error) {
+        console.error("Failed to fetch subsidy details:", error);
+        setError("데이터를 불러오는 데 실패했습니다.");
+      }
+    };
+
+    fetchData();
+    console.log(isEligible);
+  }, [params.id]);
+
+  const moveToApplication = () => {
+    window.location.href = `https://www.gov.kr/portal/rcvfvrSvc/dtlEx/${subsidyId}`;
+  };
+
   return (
     <PageContainer>
+      {error && <p>{error}</p>}
       <Header>
-        <AvailableTag>이 혜택을 받을 수 있어요!</AvailableTag>
-        <Title>유아학비 (누리과정) 지원</Title>
+        {isEligible && <AvailableTag>이 혜택을 받을 수 있어요!</AvailableTag>}
+        <Title>{detailedSubsidy.serviceName}</Title>
       </Header>
-
       <InfoBox>
-        <InfoTitle>인공지능 요약</InfoTitle>
-        <InfoContent>
-          유아학비 지원 프로그램은 3~5세 유아에게 교육비와 방과후 과정비를
-          지원하며, 저소득층 우선 지원이 있다.
-        </InfoContent>
-        <ReadMoreButton>다시 요약하기</ReadMoreButton>
+        <InfoTitle>인공지능의 중요 내용 요약</InfoTitle>
+        <InfoContent>{detailedSubsidy.summary}</InfoContent>
       </InfoBox>
 
-      <ContactInfo>
-        <div>문의처 :</div>
-        <div>보건복지상담센터1/129</div>
-        <div>교육부/02-6222-6060/10079</div>
-        <div>에듀콜/1544-0079-5-1</div>
-        <div>신청기관 : 상시신청</div>
-        <div>지원 유형 : 현금(감면)</div>
-      </ContactInfo>
-
-      <ApplyButton>신청하기</ApplyButton>
-
       <SupportDetails>
-        <h3>구비서류 :</h3>
+        <h3>기본 정보</h3>
         <RequiredDocuments>
-          <li>사회복지서비스 및 급여제공(변경) 신청서</li>
-          <li>사회복지서비스 이용권(바우처) 제공(변경) 신청서</li>
-          <li>
-            아이아랑 카드발급 신청 및 개인신용정보의 조회·제공·이용 동의서
-          </li>
+          <div>
+            {detailedSubsidy.supportType && (
+              <li>
+                지급 방식 :{" "}
+                {detailedSubsidy.supportType
+                  .split("\n")
+                  .filter((el) => el.trim() !== "")
+                  .map((el, index) => (
+                    <span key={index}>
+                      {el}
+                      {index <
+                        detailedSubsidy.supportType.split("\n").length - 1 &&
+                        ", "}
+                    </span>
+                  ))}
+              </li>
+            )}
+            {detailedSubsidy.applicationDeadline && (
+              <li>
+                신청 기한 :{" "}
+                {detailedSubsidy.applicationDeadline
+                  .split("\n")
+                  .filter((el) => el.trim() !== "")
+                  .map((el, index) => (
+                    <span key={index}>
+                      {el}
+                      {index <
+                        detailedSubsidy.applicationDeadline.split("\n").length -
+                          1 && ", "}
+                    </span>
+                  ))}
+              </li>
+            )}
+            {detailedSubsidy.servicePurpose && (
+              <li>
+                서비스 목적 :{" "}
+                {detailedSubsidy.servicePurpose
+                  .split("\n")
+                  .filter((el) => el.trim() !== "")
+                  .map((el, index) => (
+                    <span key={index}>
+                      {el}
+                      {index <
+                        detailedSubsidy.servicePurpose
+                          .split("\n")
+                          .filter((el) => el.trim() !== "").length -
+                          1 && ", "}
+                    </span>
+                  ))}
+              </li>
+            )}
+          </div>
         </RequiredDocuments>
-
-        <h3>지원 내용 :</h3>
-        <ul>
-          <li>O 3~5세에 대해 교육비를 지급합니다.</li>
-          <li>- 국공립 100,000원, 사립 280,000원</li>
-          <li>O 3~5세에 대해 방과후과정비를 지급합니다.</li>
-          <li>- 국공립 50,000원, 사립 70,000원</li>
-          <li>
-            O 사립유치원을 다니는 법정저소득층 유아에게 저소득층 유아학비를 추가
-            지급합니다.
-          </li>
-          <li>
-            - 사립 200,000원O 지원대상 : 국공립 및 사립유치원에 다니는 3~5세
-            유아
-          </li>
-          <li>
-            - '21년 1~2월생으로 유치원 입학을 희망하여 3세반에 취원한 유아도
-            지원 대상
-          </li>
-          <li>
-            취학대상 아동('17.1.1~12.31.출생)이 취학을 유예하는 경우, 유예한
-            1년에 한하여 5세 유아무상교육비 지원(취학유예 통지서 제출)
-          </li>
-        </ul>
-
-        <p>* 단, 지원기간은 3년을 초과할 수 없음.</p>
-        <p>
-          O 추가지원 : 저소득층 유아(유아학비 지원 대상 자격이 있고,
-          사립유치원에 다니는 법정저소득층(기초생활수급자, 차상위계층, 한부모
-          가정) 유아)
-        </p>
       </SupportDetails>
+
+      <ApplyButton onClick={moveToApplication}>신청하기</ApplyButton>
+
+      {detailedSubsidy.supportDetails && (
+        <SupportDetails>
+          <h3>지원 내용 :</h3>
+          <RequiredDocuments>
+            {detailedSubsidy.supportDetails
+              .split("\n")
+              .filter((el) => el.trim() !== "")
+              .map((el, index) => (
+                <li key={index}>{el}</li>
+              ))}
+          </RequiredDocuments>
+        </SupportDetails>
+      )}
+
+      {detailedSubsidy.targetGroup && (
+        <SupportDetails>
+          <h3>서비스 제공 대상 및 기타 사항 :</h3>
+          <RequiredDocuments>
+            {detailedSubsidy.targetGroup
+              .split("\n")
+              .filter((el) => el.trim() !== "")
+              .map((el, index) => (
+                <li key={index}>{el}</li>
+              ))}
+          </RequiredDocuments>
+        </SupportDetails>
+      )}
+
+      {detailedSubsidy.applicationMethod && (
+        <SupportDetails>
+          <h3>지원 방법 :</h3>
+          <RequiredDocuments>
+            {detailedSubsidy.applicationMethod
+              .split("\n")
+              .filter((el) => el.trim() !== "")
+              .map((el, index) => (
+                <li key={index}>{el}</li>
+              ))}
+          </RequiredDocuments>
+        </SupportDetails>
+      )}
+      {detailedSubsidy.requiredDocuments && (
+        <SupportDetails>
+          <h3>구비서류 :</h3>
+          <RequiredDocuments>
+            <div>
+              {detailedSubsidy.requiredDocuments
+                .split("\n")
+                .filter((el) => el.trim() !== "")
+                .map((el, index) => (
+                  <li key={index}>{el}</li>
+                ))}
+            </div>
+          </RequiredDocuments>
+        </SupportDetails>
+      )}
+      {detailedSubsidy.contactInfo && (
+        <ContactInfo>
+          <h3>문의처 :</h3>
+          <RequiredDocuments>
+            <li>{detailedSubsidy.contactInfo}</li>
+          </RequiredDocuments>
+        </ContactInfo>
+      )}
     </PageContainer>
   );
-};
+}
 
 export default SubsidyDetail;

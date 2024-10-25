@@ -65,8 +65,6 @@ function Main() {
           headers: { Authorization: `Bearer ${token}` },
         })
       : axios.create({ baseURL: "https://api.juany.kr" });
-
-    console.log(`token ${token}`);
   };
 
   // 로그인 상태와 메인 데이터 로드를 하나의 useEffect로 통합
