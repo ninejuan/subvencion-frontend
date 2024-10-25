@@ -5,7 +5,7 @@ import styled, { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
-    font-family: "Noto Sans KR", "Pretendard Variable", Pretendard, sans-serif,
+    font-family: "Noto Sans KR", "Pretendard Variable", Pretendard, sans-serif;
   }
 
   body {

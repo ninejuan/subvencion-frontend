@@ -52,7 +52,7 @@ const Text = styled.p`
   color: #666;
 `;
 
-function truncateText(text, maxLength) {
+function truncateText(text = "", maxLength) {
   return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 }
 

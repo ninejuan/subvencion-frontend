@@ -4,7 +4,6 @@ import C404 from "./pages/404";
 import GoogleSignIn from "./pages/signin";
 import SubsidyDetail from "./pages/detail";
 import Mypage from "./pages/mypage";
-import Search from "./pages/search";
 import Main from "./pages/main";
 import MenuLayout from "./layouts/MenuLayout";
 
@@ -20,10 +19,6 @@ const router = createBrowserRouter([
           {
             path: "",
             element: <Main />,
-          },
-          {
-            path: "search/:content",
-            element: <Search />,
           },
           {
             path: "signin",

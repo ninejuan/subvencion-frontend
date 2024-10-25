@@ -55,6 +55,7 @@ function Main() {
   const [searchData, setSearchData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // axios 인스턴스 생성 함수
   const createAxiosInstance = () => {
@@ -95,6 +96,7 @@ function Main() {
 
   // 검색 핸들러 개선
   const handleSearch = async (searchTerm) => {
+    setSearchTerm(searchTerm?.trim());
     if (!searchTerm?.trim()) {
       setSearchData([]);
       return;
@@ -106,9 +108,10 @@ function Main() {
     try {
       const axiosInstance = createAxiosInstance();
       const response = await axiosInstance.get(
-        `/search?content=${encodeURIComponent(searchTerm)}`
+        `/api/subsidies/search?query=${encodeURIComponent(searchTerm)}`
       );
-      setSearchData(response.data || []);
+      console.log(response.data);
+      setSearchData([...response.data] || []);
     } catch (error) {
       console.error("Search failed:", error);
       setError("검색 결과를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
@@ -125,12 +128,18 @@ function Main() {
       {loading && <p>로딩 중...</p>}
       {error && <p>{error}</p>}
 
-      {searchData.length > 0 ? (
+      {searchTerm.length > 0 ? (
         <BoxContainer>
           {searchData.map((welfare, index) => (
             <SubsidyBox
               key={`search-${welfare.serviceId}-${index}`}
-              {...welfare}
+              serviceId={welfare.serviceId}
+              title={welfare.serviceName}
+              institution={welfare.responsibleInstitutionName}
+              target={welfare.targetGroup}
+              method={welfare.applicationMethod}
+              deadline={welfare.applicationDeadline}
+              eligible={welfare.isEligible}
             />
           ))}
         </BoxContainer>
