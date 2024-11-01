@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 const ButtonContainer = styled.div`
-  width: 25%;
+  width: 20%;
   height: 50px;
   border-radius: 8px;
 
@@ -31,7 +31,7 @@ const ButtonText = styled.div`
 const getButtonStyle = (type) => {
   if (type == "btn") {
     return css`
-      background-color: #f06464;
+      background-color: #ffc9c9;
       color: #000;
     `;
   } else {

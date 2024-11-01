@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const SearchContainer = styled.div`
@@ -42,26 +41,16 @@ const SearchButton = styled.button`
 
 function SearchInput({ onSearch }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
-
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      onSearch(searchTerm.trim());
-      navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
-    }
-  };
 
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    if (value.trim() === "") {
-      onSearch(""); // 검색어가 비어있을 때 초기 상태로 복원
-    }
+    onSearch(value.trim()); // Call onSearch with the current input value
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
+    if (e.key) {
+      onSearch(searchTerm.trim());
     }
   };
 
@@ -73,9 +62,9 @@ function SearchInput({ onSearch }) {
           placeholder="검색어를 입력해주세요"
           value={searchTerm}
           onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          // onKeyDown={handleKeyDown}
         />
-        <SearchButton onClick={handleSearch}>
+        <SearchButton onClick={() => onSearch(searchTerm.trim())}>
           <svg
             width="24"
             height="24"

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import styled, { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -16,12 +17,12 @@ const GlobalStyle = createGlobalStyle`
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 세로 중앙 정렬 */
-  align-items: center; /* 가로 중앙 정렬 */
+  justify-content: center;
+  align-items: center;
   height: 100vh;
-  background-color: #f2f4f6;
+  background-color: #fff;
   padding: 0 20px;
-  box-sizing: border-box; /* 패딩 포함 */
+  box-sizing: border-box;
 `;
 
 const LoginContainer = styled.div`
@@ -34,7 +35,7 @@ const LoginContainer = styled.div`
   background-color: #ffffff;
   padding: 40px;
   margin-top: -200px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   overflow: hidden;
 `;
@@ -69,68 +70,55 @@ const GoogleButton = styled.button`
   }
 `;
 
-const ProfileIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  margin-left: 16px;
-`;
-
-function GoogleSignIn() {
+const GoogleSignIn = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     checkLoginStatus();
+    handleRedirect();
   }, []);
 
   const checkLoginStatus = () => {
-    const cookies = document.cookie.split(";");
-    const accessTokenCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith("accessToken=")
-    );
-    setIsLoggedIn(!!accessTokenCookie);
+    const token = Cookies.get("accessToken");
+    setIsLoggedIn(token ? true : false);
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://api.svcion.com/api/auth/google";
+    window.location.href = "https://api.juany.kr/api/auth/google";
   };
 
-  useEffect(() => {
-    const handleRedirect = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
+  const handleRedirect = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
 
-      if (code) {
-        try {
-          const response = await fetch(
-            "https://api.svcion.com/api/auth/google/redirect",
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log("로그인 성공:", data);
-            setIsLoggedIn(true);
-            window.history.replaceState(
-              {},
-              document.title,
-              window.location.pathname
-            );
-          } else {
-            console.error("로그인 실패");
+    if (code) {
+      try {
+        const response = await fetch(
+          `https://api.juany.kr/api/auth/google/redirect?code=${code}`,
+          {
+            method: "GET",
+            credentials: "include",
           }
-        } catch (error) {
-          console.error("로그인 처리 중 오류 발생:", error);
-        }
-      }
-    };
+        );
 
-    handleRedirect();
-  }, []);
+        if (response.ok) {
+          const data = await response.json();
+          Cookies.set("accessToken", data.accessToken, { expires: 7 });
+          setIsLoggedIn(true);
+
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+        } else {
+          console.error("로그인 실패");
+        }
+      } catch (error) {
+        console.error("로그인 처리 중 오류 발생:", error);
+      }
+    }
+  };
 
   return (
     <>
@@ -142,10 +130,10 @@ function GoogleSignIn() {
             <p style={{ fontSize: "20px" }}>로그인 되었습니다!</p>
           ) : (
             <GoogleButton onClick={handleGoogleLogin}>
-              <img
+              {/* <img
                 src="https://developers.google.com/identity/images/g-logo.png"
                 alt="Google logo"
-              />
+              /> */}
               Sign in with Google
             </GoogleButton>
           )}
@@ -153,6 +141,6 @@ function GoogleSignIn() {
       </PageContainer>
     </>
   );
-}
+};
 
 export default GoogleSignIn;

@@ -5,7 +5,7 @@ import styled, { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
-    font-family: "Noto Sans KR", "Pretendard Variable", Pretendard, sans-serif,
+    font-family: "Noto Sans KR", "Pretendard Variable", Pretendard, sans-serif;
   }
 
   body {
@@ -15,8 +15,9 @@ const GlobalStyle = createGlobalStyle`
 
 const AppContainer = styled.div`
   max-width: 100vw;
-  /* height: 100%; */
+  width: 100%;
   margin: 0 auto;
+  overflow-x: hidden !important;
 `;
 
 function App() {
