@@ -1,185 +1,413 @@
-import React, { useState } from "react";
-import { Search, X, ChevronDown } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cookies from "js-cookie";
 
-const qualificationOptions = {
-  고등학생: "JA1000",
-  대학생: "JA2000",
-  일반: "JA3000",
-  중학생: "JA4000",
-  다문화가족: "JA5000",
-  예비창업자: "JA6000",
-  "한부모가정/조손가정": "JA7000",
-  해당사항없음: "JA8000",
-};
+// 기본 스타일 구성
+const PageContainer = styled.div`
+  padding: 24px;
+  max-width: 500px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+`;
 
-function Mypage() {
-  const [keywords, setKeywords] = useState(["저소득"]);
-  const [inputKeyword, setInputKeyword] = useState("");
-  const [selectedQualification, setSelectedQualification] =
-    useState("고등학생");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState([
-    "고등학생",
-    "저소득",
-    "예비창업자",
-  ]);
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+`;
 
-  const handleKeywordChange = (e) => {
-    setInputKeyword(e.target.value);
+const ProfileImage = styled.div`
+  width: 50px;
+  height: 50px;
+  margin-right: 12px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ddd;
+`;
+
+const ProfileName = styled.h1`
+  font-size: 1.25em;
+  font-weight: 600;
+  color: #333;
+`;
+
+const Section = styled.section`
+  margin: 24px 0;
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 1.15em;
+  margin-bottom: 8px;
+  color: #444;
+  font-weight: 500;
+`;
+
+const KeywordInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95em;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+`;
+
+const Button = styled.button`
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+
+  &.primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  &.secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  &.danger {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  &:hover {
+    filter: brightness(90%);
+  }
+`;
+
+const DropdownContainer = styled.div`
+  position: relative;
+`;
+
+const DropdownButton = styled.button`
+  width: 100%;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 0.95em;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 8px 0;
+  width: 100%;
+  z-index: 1;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const DropdownItem = styled.div`
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.95em;
+  color: ${({ selected }) => (selected ? "#007bff" : "#333")};
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
+const KeywordChip = styled.div`
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  margin: 4px;
+  background-color: #eef2f7;
+  border-radius: 16px;
+  font-size: 0.9em;
+  cursor: pointer;
+  color: #333;
+
+  &::after {
+    content: "×";
+    margin-left: 4px;
+    font-size: 1em;
+  }
+`;
+
+const Mypage = () => {
+  const navigate = useNavigate();
+  const [keywords, setKeywords] = useState([]);
+  const [newKeyword, setNewKeyword] = useState("");
+  const [selections, setSelections] = useState({});
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [email, setEmail] = useState("");
+
+  const jacodeMap = {
+    JA0101: "남성",
+    JA0102: "여성",
+    JA0201: "중위소득 0~50%",
+    JA0202: "중위소득 51~75%",
+    JA0203: "중위소득 76~100%",
+    JA0204: "중위소득 101~200%",
+    JA0205: "중위소득 200% 초과",
+    JA0301: "예비부모/난임",
+    JA0302: "임산부",
+    JA0303: "출산/입양",
+    JA0313: "농업인",
+    JA0314: "어업인",
+    JA0315: "축산업인",
+    JA0316: "임업인",
+    JA0317: "초등학생",
+    JA0318: "중학생",
+    JA0319: "고등학생",
+    JA0320: "대학생/대학원생",
+    JA0322: "해당사항없음",
+    JA0326: "근로자/직장인",
+    JA0327: "구직자/실업자",
+    JA0401: "다문화가족",
+    JA0402: "북한이탈주민",
+    JA0403: "한부모가정/조손가정",
+    JA0404: "1인가구",
+    JA0410: "해당사항없음",
+    JA0411: "다자녀가구",
+    JA0412: "무주택세대",
+    JA0413: "신규전입",
+    JA0414: "확대가족",
+    JA1101: "예비창업자",
+    JA1102: "영업중",
+    JA1103: "생계곤란/폐업예정자",
+    JA1201: "음식업",
+    JA1202: "제조업",
+    JA1299: "기타업종",
+    JA2101: "중소기업",
+    JA2102: "사회복지시설",
+    JA2103: "기관/단체",
+    JA2201: "제조업",
+    JA2202: "농업,임업 및 어업",
+    JA2203: "정보통신업",
+    JA2299: "기타업종",
+    JA0328: "장애인",
+    JA0329: "국가보훈대상자",
+    JA0330: "질병/질환자",
   };
 
-  const addKeyword = (e) => {
-    if (e.key === "Enter" && inputKeyword.trim() !== "") {
-      setKeywords([...keywords, inputKeyword.trim()]);
-      setInputKeyword("");
+  const createAxiosInstance = () => {
+    const token = Cookies.get("accessToken");
+    return token
+      ? axios.create({
+          baseURL: "https://api-subvencion.juany.kr",
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      : axios.create({ baseURL: "https://api-subvencion.juany.kr" });
+  };
+
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+
+    const fetchUserProperties = async () => {
+      const token = Cookies.get("accessToken");
+      if (!token) {
+        navigate("/signin");
+        return;
+      }
+      console.log(token);
+      try {
+        const response = await axios.get(
+          "https://api-subvencion.juany.kr/api/auth/properties",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.data) {
+          if (response.data.keyword) {
+            setKeywords(response.data.keyword);
+          }
+
+          if (response.data.jacode) {
+            const newSelections = response.data.jacode.reduce((acc, code) => {
+              acc[code] = true;
+              return acc;
+            }, {});
+            setSelections(newSelections);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user properties:", error);
+      }
+    };
+
+    fetchUserProperties();
+  }, [navigate]);
+
+  const handleAddKeyword = (e) => {
+    if (e.key === "Enter" && newKeyword.trim()) {
+      setKeywords([...keywords, newKeyword.trim()]);
+      setNewKeyword("");
     }
   };
 
-  const removeKeyword = (keywordToRemove) => {
-    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
+  const handleRemoveKeyword = (indexToRemove) => {
+    setKeywords(keywords.filter((_, index) => index !== indexToRemove));
+  };
+
+  const toggleSelection = (key) => {
+    setSelections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleRemoveSelection = (key) => {
+    setSelections((prev) => ({
+      ...prev,
+      [key]: false,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const jacode = Object.entries(selections)
+        .filter(([_, value]) => value)
+        .map(([key]) => key);
+
+      const axiosInstance = createAxiosInstance();
+
+      await axiosInstance.post("/api/auth/applyProperties", {
+        jacode: Object.keys(selections),
+        keyword: keywords,
+      });
+      alert("저장되었습니다.");
+    } catch (error) {
+      console.error("Failed to save properties:", error);
+      alert("저장에 실패했습니다.");
+    }
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setDropdownOpen(!dropdownOpen);
   };
 
-  const toggleOption = (option) => {
-    setSelectedOptions((prevOptions) =>
-      prevOptions.includes(option)
-        ? prevOptions.filter((item) => item !== option)
-        : [...prevOptions, option]
+  const getUserData = async () => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+    const response = await axios.get(
+      "https://api-subvencion.juany.kr/api/auth/userdata",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
-    setIsDropdownOpen(false);
+    setName(response.data.name);
+    setPhoto(response.data.profile);
+    setEmail(response.data.mail);
   };
-
-  const handleSave = () => {
-    // 여기에 저장 로직을 구현합니다.
-    console.log("저장된 키워드:", keywords);
-    console.log(
-      "저장된 자격요건:",
-      selectedOptions.map((option) => ({
-        [option]: qualificationOptions[option],
-      }))
-    );
-  };
-
+  useEffect(async () => {
+    await getUserData();
+  }, []);
   return (
-    <div className="p-6 bg-white max-w-md mx-auto">
-      <div className="flex items-center space-x-4 mb-6">
-        <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
-          <svg
-            className="w-8 h-8 text-white"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M4 4H20L12 12L4 4Z" fill="currentColor" />
-            <path d="M20 20H4L12 12L20 20Z" fill="currentColor" />
-          </svg>
-        </div>
-        <div>
-          <h2 className="font-semibold">이주안 (me@juany.kr)</h2>
-        </div>
-      </div>
+    <PageContainer>
+      <ProfileSection>
+        <ProfileImage>
+          <img src={photo || "https://via.placeholder.com/50"} alt="Profile" />
+        </ProfileImage>
+        <ProfileName>
+          {name} ({email})
+        </ProfileName>
+      </ProfileSection>
 
-      <section className="mb-6">
-        <h3 className="font-semibold mb-2">나의 키워드</h3>
-        <div className="relative">
-          <div className="flex items-center border rounded-md">
-            <Search className="text-gray-400 ml-2" size={20} />
-            <input
-              type="text"
-              value={inputKeyword}
-              onChange={handleKeywordChange}
-              onKeyPress={addKeyword}
-              placeholder="키워드"
-              className="w-full p-2 outline-none"
-            />
-            {inputKeyword && (
-              <button onClick={() => setInputKeyword("")} className="mr-2">
-                <X size={20} className="text-gray-400" />
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="mt-2">
+      <Section>
+        <SectionTitle>키워드 관리</SectionTitle>
+        <KeywordInput
+          type="text"
+          placeholder="키워드를 입력하고 Enter를 누르세요"
+          value={newKeyword}
+          onChange={(e) => setNewKeyword(e.target.value)}
+          onKeyDown={handleAddKeyword}
+        />
+        <div>
           {keywords.map((keyword, index) => (
-            <span
-              key={index}
-              className="inline-flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-            >
+            <KeywordChip key={index} onClick={() => handleRemoveKeyword(index)}>
               {keyword}
-              <button
-                onClick={() => removeKeyword(keyword)}
-                className="ml-1 text-gray-500 hover:text-gray-700"
-              >
-                <X size={14} />
-              </button>
-            </span>
+            </KeywordChip>
           ))}
         </div>
-      </section>
+      </Section>
 
-      <section className="mb-6">
-        <h3 className="font-semibold mb-2">나의 자격요건</h3>
-        <div className="relative mb-4">
-          <button
-            onClick={toggleDropdown}
-            className="w-full flex items-center justify-between border border-red-500 rounded-md p-2 bg-white"
-          >
-            <span>{selectedQualification}</span>
-            <ChevronDown
-              size={20}
-              className={`text-red-500 transform transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute left-0 right-0 mt-1 bg-red-50 border border-red-100 rounded-md shadow-lg z-10">
-              {Object.keys(qualificationOptions).map((option) => (
-                <button
-                  key={option}
-                  onClick={() => toggleOption(option)}
-                  className="block w-full text-left px-4 py-2 hover:bg-red-100 text-red-700"
+      <Section>
+        <SectionTitle>자격 요건</SectionTitle>
+        <DropdownContainer>
+          <DropdownButton onClick={toggleDropdown}>
+            자격 요건을 선택하세요
+          </DropdownButton>
+          {dropdownOpen && (
+            <DropdownMenu>
+              {Object.entries(jacodeMap).map(([key, value]) => (
+                <DropdownItem
+                  key={key}
+                  onClick={() => toggleSelection(key)}
+                  selected={selections[key]}
                 >
-                  {option}
-                </button>
+                  {value}
+                </DropdownItem>
               ))}
-            </div>
+            </DropdownMenu>
           )}
-        </div>
+        </DropdownContainer>
         <div>
-          <h4 className="text-sm font-semibold mb-2 text-pink-500">
-            활성화된 지역
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {selectedOptions.map((option) => (
-              <span
-                key={option}
-                className="inline-flex items-center bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700"
-              >
-                {option}
-                <button
-                  onClick={() => toggleOption(option)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                >
-                  <X size={14} />
-                </button>
-              </span>
+          {Object.entries(selections)
+            .filter(([_, selected]) => selected)
+            .map(([key]) => (
+              <KeywordChip key={key} onClick={() => handleRemoveSelection(key)}>
+                {jacodeMap[key]}
+              </KeywordChip>
             ))}
-          </div>
         </div>
-      </section>
+      </Section>
 
-      <button
-        onClick={handleSave}
-        className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
-      >
-        저장
-      </button>
-    </div>
+      <ButtonGroup>
+        <Button className="primary" onClick={handleSave}>
+          저장
+        </Button>
+        <Button className="secondary" onClick={() => navigate("/")}>
+          돌아가기
+        </Button>
+        <Button
+          className="danger"
+          onClick={() => Cookies.remove("accessToken")}
+        >
+          로그아웃
+        </Button>
+      </ButtonGroup>
+    </PageContainer>
   );
-}
+};
 
 export default Mypage;

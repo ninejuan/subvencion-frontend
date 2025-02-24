@@ -84,7 +84,7 @@ const GoogleSignIn = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://api.juany.kr/api/auth/google";
+    window.location.href = "https://api-subvencion.juany.kr/api/auth/google";
   };
 
   const handleRedirect = async () => {
@@ -94,7 +94,7 @@ const GoogleSignIn = () => {
     if (code) {
       try {
         const response = await fetch(
-          `https://api.juany.kr/api/auth/google/redirect?code=${code}`,
+          `https://api-subvencion.juany.kr/api/auth/google/redirect?code=${code}`,
           {
             method: "GET",
             credentials: "include",

@@ -72,14 +72,6 @@ function Header() {
       <MobileOnlyItem />
 
       <HeaderItem>
-        <MobileOnlyButton
-          type="text"
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          검색
-        </MobileOnlyButton>
         {isLoggedIn ? (
           <Button
             onClick={() => {

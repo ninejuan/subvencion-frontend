@@ -62,10 +62,10 @@ function Main() {
     const token = Cookies.get("accessToken");
     return token
       ? axios.create({
-          baseURL: "https://api.juany.kr",
+          baseURL: "https://api-subvencion.juany.kr",
           headers: { Authorization: `Bearer ${token}` },
         })
-      : axios.create({ baseURL: "https://api.juany.kr" });
+      : axios.create({ baseURL: "https://api-subvencion.juany.kr" });
   };
 
   // 로그인 상태와 메인 데이터 로드를 하나의 useEffect로 통합
@@ -110,8 +110,8 @@ function Main() {
       const response = await axiosInstance.get(
         `/api/subsidies/search?query=${encodeURIComponent(searchTerm)}`
       );
-      console.log(response.data);
       setSearchData([...response.data] || []);
+      console.log(searchData[0]);
     } catch (error) {
       console.error("Search failed:", error);
       setError("검색 결과를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
@@ -130,9 +130,9 @@ function Main() {
 
       {searchTerm.length > 0 ? (
         <BoxContainer>
-          {searchData.map((welfare, index) => (
+          {searchData.map((welfare) => (
             <SubsidyBox
-              key={`search-${welfare.serviceId}-${index}`}
+              key={`search-${welfare.serviceId}`}
               serviceId={welfare.serviceId}
               title={welfare.serviceName}
               institution={welfare.responsibleInstitutionName}

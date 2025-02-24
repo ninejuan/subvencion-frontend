@@ -103,10 +103,10 @@ function SubsidyDetail() {
     const token = Cookies.get("accessToken");
     return token
       ? axios.create({
-          baseURL: "https://api.juany.kr",
+          baseURL: "https://api-subvencion.juany.kr",
           headers: { Authorization: `Bearer ${token}` },
         })
-      : axios.create({ baseURL: "https://api.juany.kr" });
+      : axios.create({ baseURL: "https://api-subvencion.juany.kr" });
   };
 
   useEffect(() => {
@@ -130,6 +130,7 @@ function SubsidyDetail() {
             // ["isEligible"]: response.data.isEligible,
           });
           setIsEligible(response.data.isEligible);
+          console.log(response.data);
         } else {
           throw new Error("Data not found");
         }
